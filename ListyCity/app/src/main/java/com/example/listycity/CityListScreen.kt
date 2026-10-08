@@ -32,6 +32,7 @@ fun CityListScreen(
     cities: List<City>,
     onAddCity: (City) -> Unit,
     onUpdateCity: (City, City) -> Unit,
+    onRemoveCity: (City) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var newCityName by remember { mutableStateOf("") }
@@ -59,6 +60,7 @@ fun CityListScreen(
             ) {
                 Text("+")
             }
+
         }
         if (showAddCityFields) {
             Row(
@@ -83,25 +85,29 @@ fun CityListScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Button(
-                    modifier = Modifier.padding(vertical = 12.dp),
-                    onClick = {
-                        if (newCityName.isNotBlank() && newProvinceName.isNotBlank()) {
-                            onAddCity(
-                                City(
-                                    name = newCityName,
-                                    province = newProvinceName
-                                )
-                            )
 
-                            newCityName = ""
-                            newProvinceName = ""
-                            showAddCityFields = false
+                    Button(
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        onClick = {
+                            if (newCityName.isNotBlank() && newProvinceName.isNotBlank()) {
+                                onAddCity(
+                                    City(
+                                        name = newCityName,
+                                        province = newProvinceName
+                                    )
+                                )
+
+                                newCityName = ""
+                                newProvinceName = ""
+                                showAddCityFields = false
+                            }
                         }
+                    ) {
+                        Text("ADD CITY")
                     }
-                ) {
-                    Text("ADD CITY")
-                }
+
+
+
             }
         }
         if (selectedCity != null) {
@@ -128,6 +134,12 @@ fun CityListScreen(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
+            }
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.Center) {
                 Button(
                     modifier = Modifier.padding(vertical = 12.dp),
                     onClick = {
@@ -153,6 +165,30 @@ fun CityListScreen(
                 ) {
                     Text("UPDATE CITY")
                 }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(modifier = Modifier.padding(vertical = 12.dp),
+                    onClick = {
+                        val city_to_delete = selectedCity
+
+                        if(
+                            city_to_delete != null &&
+                            editedCityName.isNotBlank() &&
+                            editedProvinceName.isNotBlank()
+                        ){
+                            onRemoveCity(City(
+                                name = editedCityName,
+                                province = editedProvinceName
+                            ))
+
+                            selectedCity = null
+                            editedCityName = ""
+                            editedProvinceName = ""
+                        }
+
+                    }
+                ) {Text("Delete City")}
             }
         }
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -202,18 +238,3 @@ fun CityRow(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun CityListScreenPreview() {
-    ListyCityTheme {
-        CityListScreen(
-            cities = listOf(
-                City("Edmonton", "AB"),
-                City("Vancouver", "BC"),
-                City("Calgary", "AB")
-            ),
-            onAddCity = {},
-            onUpdateCity = { _, _ -> }
-        )
-    }
-}
